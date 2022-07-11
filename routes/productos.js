@@ -46,7 +46,7 @@ router.delete("/productos/:id", async (req, res) => {
 });
 
 //FAKER
-router.get('/productos/vista-test', (req,res)=>{
+router.get('/productos-test', (req,res)=>{
   let productos = [];
   let cant = req.query.cant || 5;
   if (cant == 0) {
