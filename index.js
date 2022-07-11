@@ -61,17 +61,10 @@ io.on('connection', (socket) => {
       price: price,
       thumbnail: thumbnail,
     };
-
+    producto.push(productos);
     console.log(producto)
 
-    ProductoDB.create(producto, (error, productoDB) => {
-      if (error) {
-        throw "Error al grabar productos " + error;
-      } else {
-        productos.push(productoDB);
-        io.sockets.emit('listar', productos)
-      }
-    });
+    io.sockets.emit('listar', productos)
   })
 
   console.log('normalizr:')
@@ -90,18 +83,17 @@ io.on('connection', (socket) => {
   console.log('Longitud después de normalizar:', JSON.stringify(normalizedChat).length);
   io.sockets.emit('mensajes', mensajes, JSON.stringify(chat).length, JSON.stringify(normalizedChat).length);
 
-  socket.on('nuevo', (mensaje) => {
-    MensajeDB.insertMany(mensaje, (error) => {
-      if (error) {
-        throw "Error al grabar mensajes " + error;
-      } else {
-        mensajes.push(mensaje);
-
+  socket.on('nuevo', (data) => {
+    MensajeDB.insertMany([data])
+    .then((id_insertado) => {
+      mensajes['id'] = id_insertado[0];
+      mensajes.push(data);
         console.log('Longitud antes de normalizar:', JSON.stringify(chat).length);
         console.log('Longitud después de normalizar:', JSON.stringify(normalizedChat).length);
         io.sockets.emit('mensajes', mensajes, JSON.stringify(chat).length, JSON.stringify(normalizedChat).length);
         console.log(`Mensajes grabados...`);
-      }
+      
     });
   })
+
 });
